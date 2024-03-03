@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcryptjs";
+import JWT from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema(
   {
@@ -20,6 +22,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       require: [true, "Password is required"],
       minlength: [6, "Password atleast 6 character"],
+      select: false,
     },
     location: {
       type: String,
@@ -29,4 +32,16 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// midleware to hash password
+userSchema.pre("save", async function () {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+// json webtoken
+userSchema.methods.createJWT = function () {
+  // sign({which data base for generat token}, {add a secret key}, {give the expire time})
+  return JWT.sign({ userId: this._id }, process.env.SECRET_KEY, {
+    expiresIn: "1d",
+  });
+};
 export default mongoose.model("User", userSchema);
