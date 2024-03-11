@@ -8,6 +8,8 @@ import morgan from "morgan";
 import "express-async-errors";
 // import routes
 import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import jobRoute from "./routes/jobRoutes.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 
 // rest objects
@@ -26,7 +28,8 @@ app.use(morgan("dev"));
 // routes
 
 app.use("/api/v1/auth", authRoutes);
-
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/job", jobRoute);
 // error Middleware
 app.use(errorMiddleware);
 // listen port
