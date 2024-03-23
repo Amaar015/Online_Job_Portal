@@ -14,10 +14,55 @@ export const createJobCollector = async (req, res, next) => {
 
 // get all jobs
 export const getJobController = async (req, res, next) => {
-  const job = await jobModel.find({ createdBy: req.user.userId });
+  //  get these values from local url
+  const { status, workType, search, sort } = req.query;
+  //  conditions for searching job filters
+  const queryObject = {
+    createdBy: req.user.userId,
+  };
+  // logic for filters
+  if (status && status !== "all") {
+    queryObject.status = status;
+  }
+  if (workType && workType !== "all") {
+    queryObject.workType = workType;
+  }
+  if (search) {
+    queryObject.position = { $regex: search, $options: "i" };
+  }
+
+  // get filtered job
+  let queryResult = jobModel.find(queryObject);
+  // sorting
+  if (sort === "latest") {
+    queryResult = queryResult.sort("-createdAt");
+  }
+  if (sort === "oldest") {
+    queryResult = queryResult.sort("createdAt");
+  }
+  if (sort === "a-z") {
+    queryResult = queryResult.sort("position");
+  }
+  if (sort === "z-a") {
+    queryResult = queryResult.sort("-position");
+  }
+
+  //  pagination from backend
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  queryResult = queryResult.skip(skip).limit(limit);
+  // total jobs count
+  const totalJobs = await jobModel.countDocuments(queryResult);
+  const numOfPage = Math.ceil(totalJobs / limit);
+
+  const job = await queryResult;
+  // const job = await jobModel.find({ createdBy: req.user.userId });
   res.status(200).json({
-    totaljob: job.length,
+    totalJobs,
     job,
+    numOfPage,
   });
 };
 // ======= UPDATE JOBS ===========
