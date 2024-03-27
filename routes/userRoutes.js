@@ -1,6 +1,9 @@
 import express from "express";
 import userAuth from "../middleware/authMiddleware.js";
-import { updateUserController } from "../controllers/userController.js";
+import {
+  getUserController,
+  updateUserController,
+} from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -11,4 +14,6 @@ const router = express.Router();
 // update user
 router.put("/update-user", userAuth, updateUserController);
 
+// get user data // post
+router.post("/getUser", userAuth, getUserController);
 export default router;

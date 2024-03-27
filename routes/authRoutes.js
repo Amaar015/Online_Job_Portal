@@ -1,10 +1,11 @@
 // import
 import express from "express";
 import {
-  LoginController,
   RegisterController,
+  loginController,
 } from "../controllers/authControllers.js";
 import rateLimit from "express-rate-limit";
+import userAuth from "../middleware/authMiddleware.js";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -26,7 +27,9 @@ const router = express.Router();
 router.post("/register", limiter, RegisterController);
 
 // Login and Post
-router.post("/login", limiter, LoginController);
+router.post("/login", loginController);
+
+// Auth controller
 
 // export
 export default router;

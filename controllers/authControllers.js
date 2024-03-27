@@ -1,7 +1,7 @@
 import userModel from "../models/userModel.js";
 
 export const RegisterController = async (req, res, next) => {
-  const { firstName, email, password } = req.body;
+  const { firstName, email, location, password } = req.body;
   // validation
   if (!firstName) {
     next("Please Enter your name!");
@@ -33,7 +33,7 @@ export const RegisterController = async (req, res, next) => {
   });
 };
 
-export const LoginController = async (req, res, next) => {
+export const loginController = async (req, res, next) => {
   const { email, password } = req.body;
 
   console.log(email);
@@ -46,12 +46,14 @@ export const LoginController = async (req, res, next) => {
   if (!user) {
     next("Invalid Username or Password");
   }
-  console.log(user);
+
   // compare password
+  console.log(`password ${password}`);
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
     next("Invalid User Email & password");
   }
+  console.log(` hell Amaar ${user.password}`);
   user.password = undefined;
   const token = user.createJWT();
   console.log(token);
@@ -62,3 +64,5 @@ export const LoginController = async (req, res, next) => {
     token,
   });
 };
+
+// auth
